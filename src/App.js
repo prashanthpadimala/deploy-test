@@ -9,7 +9,7 @@ function App() {
       <h1>Enter your name </h1>
       <input onChange={(e) => setYourName(e.target.value)} placeholder={"Enter name"} />
       {yourName && <h2>Hi {yourName}</h2>}
-      <h3>Thanks for using </h3>
+      <h3>Thanks for using our app </h3>
     </div>
   );
 }
