@@ -1,32 +1,40 @@
 import React, { useEffect, useState } from 'react'
 
 import './App.css';
+import Home from './Components/Home';
+import Selected from './Components/Selected';
+import { Configuration, OpenAIApi } from "openai";
 
 function App() {
-  const [yourName, setYourName] = React.useState("")
+  const [selected, setSelected] = useState({})
+  const [results, setResults] = useState("")
+  const configuration = new Configuration({
+    apiKey: process.env.REACT_APP_KEY,
+  });
 
-  const msg = new SpeechSynthesisUtterance();
-  const [value, setValue] = useState("");
-  const [password, setPassword] = useState("Xcube@123");
-  const [userPassword, setUserPassword] = useState("")
-  const speechHandler = () => {
-    msg.text = value;
-    window.speechSynthesis.speak(msg);
+  const selectedOption = (options) => {
+    setSelected(options.options)
+  }
+  const getDataFromAI = async (data) => {
+    let item = { ...selected, prompt: data }
+
+    const openai = new OpenAIApi(configuration);
+    const response = await openai.createCompletion(item);
+    console.log("000000000000", response.data.choices[0].text)
+    setResults(response.data.choices[0].text)
   }
   return (
     <div className="App">
-      <h1>Enter your name </h1>
-      <input onChange={(e) => setYourName(e.target.value)} placeholder={"Enter name"} />
-      {yourName && <h2>Hi {yourName}</h2>}
-      <h3>Thanks for using our app </h3>
-      {password === userPassword && <h1>iam sending my wishes</h1>}
-      <input placeholder='Enter password to see text' type={"password"} onChange={(e) => { setUserPassword(e.target.value) }} />
-      <h1>Text To SPeech</h1>
-      <input value={value} onChange={(e) => setValue(e.target.value)} placeholder={"Enter Text to Speak"} />
-      <button variant='contained' color="secondary" onClick={speechHandler}>Speak</button>
-
+      <h1> React AI Application</h1>
+      {Object.values(selected).length ?
+        <div>
+          <Selected onEnter={(e) => getDataFromAI(e)} />
+          <p>{results}</p>
+        </div>
+        : <Home selectedOption={(e) => selectedOption(e)} />
+      }
     </div>
-  );
+  )
 }
 
 export default App;
